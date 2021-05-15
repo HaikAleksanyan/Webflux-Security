@@ -1,0 +1,8 @@
+server:
+  port: 8000
+spring:
+  data:
+    mongodb:
+      database: webflux_demo
+      host: localhost
+      port: 27017
