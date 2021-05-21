@@ -1,6 +1,7 @@
 package com.webflux.auth.handler;
 
 import com.webflux.auth.config.security.TokenProvider;
+import com.webflux.auth.config.security.TotpManager;
 import com.webflux.auth.entity.AppUser;
 import com.webflux.auth.handler.dto.AuthDto;
 import com.webflux.auth.repository.UserRepository;
@@ -30,7 +31,9 @@ public class AuthHandler {
         return request.bodyToMono(AuthDto.AuthRequest.class)
                 .flatMap(dto -> repository.findByUsername(dto.getUsername())
                         .flatMap(user -> {
-                            if (passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+                            boolean codeMatched = TotpManager.validateCode(dto.getCode(), user.getSecretKey());
+
+                            if (passwordEncoder.matches(dto.getPassword(), user.getPassword()) && codeMatched) {
                                 return ServerResponse.ok().contentType(APPLICATION_JSON).bodyValue(new AuthDto.AuthResponse(tokenProvider.generateToken(user)));
                             } else {
                                 return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue("Wrong credentials");
@@ -40,15 +43,18 @@ public class AuthHandler {
 
     @NonNull
     public Mono<ServerResponse> signUp(ServerRequest request) {
+        final String secretKey = TotpManager.generateSecret();
         return request.bodyToMono(AppUser.class)
                 .map(user -> {
                     user.setPassword(passwordEncoder.encode(user.getPassword()));
                     user.setRoles(Collections.emptyList());
+                    user.setSecretKey(secretKey);
                     return user;
                 }).flatMap(user -> repository.findByUsername(user.getUsername())
                         .flatMap(existing -> ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue("Username already exists!"))
                         .switchIfEmpty(repository.save(user)
-                                .flatMap(savedUser -> ServerResponse.ok().contentType(APPLICATION_JSON).bodyValue(savedUser))));
+                                .flatMap(savedUser -> ServerResponse.ok().contentType(APPLICATION_JSON)
+                                        .bodyValue(new AuthDto.SignUpResponse(savedUser, secretKey)))));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_WRITE')")
