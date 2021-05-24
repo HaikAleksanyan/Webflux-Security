@@ -21,5 +21,12 @@ public class AppUser {
 
     private String password;
 
+    private String secretKey;
+
     private List<AppRole> roles = new ArrayList<>();
+
+    public AppUser(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 }
