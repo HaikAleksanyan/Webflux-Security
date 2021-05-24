@@ -16,15 +16,15 @@ public class UserRouteTest {
     @Autowired
     WebTestClient webClient;
 
-    @Test
-    @DisplayName("Should return forbidden status when role is not WRITE")
-    @WithMockUser(username = "adam", roles = {"READ"})
-    void test_write_api_with_read_role() {
-        webClient.post().uri("/write/abdul")
-                .header(HttpHeaders.ACCEPT, "application/json")
-                .exchange()
-                .expectStatus().isForbidden();
-    }
+//    @Test
+//    @DisplayName("Should return forbidden status when role is not WRITE")
+//    @WithMockUser(username = "adam", roles = {"READ"})
+//    void test_write_api_with_read_role() {
+//        webClient.post().uri("/write/abdul")
+//                .header(HttpHeaders.ACCEPT, "application/json")
+//                .exchange()
+//                .expectStatus().isForbidden();
+//    }
 
 //    @Test
 //    public void test_login() {
