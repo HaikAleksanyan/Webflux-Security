@@ -19,7 +19,7 @@ import static com.webflux.auth.config.AppConstants.TOKEN_PREFIX;
 @Component
 public class SecurityContextRepository implements ServerSecurityContextRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(SecurityContextRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityContextRepository.class);
 
     private final AuthenticationManager authenticationManager;
 
@@ -41,8 +41,8 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
         if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
             authToken = authHeader.replace(TOKEN_PREFIX, "");
-        }else {
-            logger.warn("couldn't find bearer string, will ignore the header.");
+        } else {
+            LOG.warn("Couldn't find bearer string, will ignore the header.");
         }
 
         if (authToken != null) {
