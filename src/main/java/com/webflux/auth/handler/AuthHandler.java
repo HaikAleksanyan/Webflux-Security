@@ -4,6 +4,7 @@ import com.webflux.auth.config.security.TokenProvider;
 import com.webflux.auth.config.security.TotpManager;
 import com.webflux.auth.entity.AppUser;
 import com.webflux.auth.handler.dto.AuthDto;
+import com.webflux.auth.handler.dto.ErrorResponse;
 import com.webflux.auth.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -50,7 +51,7 @@ public class AuthHandler {
                     user.setSecretKey(secretKey);
                     return user;
                 }).flatMap(user -> repository.findByUsername(user.getUsername())
-                        .flatMap(existing -> ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue("Username already exists!"))
+                        .flatMap(existing -> ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON).bodyValue(new ErrorResponse("Username already exists!")))
                         .switchIfEmpty(repository.save(user)
                                 .flatMap(savedUser -> ServerResponse.ok().contentType(APPLICATION_JSON)
                                         .bodyValue(new AuthDto.SignUpResponse(savedUser, secretKey)))));
