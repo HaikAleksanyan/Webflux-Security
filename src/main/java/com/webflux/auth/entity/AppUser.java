@@ -19,6 +19,8 @@ public class AppUser {
 
     private String username;
 
+    private boolean disabled;
+
     private String password;
 
     private String secretKey;
